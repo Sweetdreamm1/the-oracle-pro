@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 # --- ข้อมูลสัจธรรมที่บอสประทับไว้ ---
 VERIFY_TOKEN = "theoracle_bossbook"
-PAGE_ACCESS_TOKEN = "EAALZAVSrprsEBQhYW3ZAwC5W2C0QnLqkqbOSzhvMyMJZCZB2wdNvTdDp5cFjXfgSJkm3zbBLfBWGNDRqre6WYa84VdMIYS2BtbGPBroDHc1HlRQPgP9UIZCchGEqzVE9QDZCNYwkuZA4Msmt9NMu7i8VcT6ZCrjpFCH74GabZCtusDCwOYWSWthBhwV0kY4RQW1sPtZBSxsXomesmeef6GwUAZCuiPK9AZDZD"
+PAGE_ACCESS_TOKEN = "EAALZAVSrprsEBQvZAo9SUNft1h3k1wILBls0YuRcf2K4rmmB2DFvsZAELmN42viz1ZBvNcOrZBuLGKlr4MmCUsnnjbtYUslGpSNTsZCk2cjwsYemvF5H1ZAh14zBiHRjWpA0ZBGX5EtCtTlZArbuoVrH2jCD0Pk2VQoB5TEqwXiHw3GHavUqX0yBHxZCWpx0yiXPBmIN9edsIeizVsNElOy9UDnyJ25wZDZD"
 
 @app.route("/", methods=["GET"])
 def verify():
