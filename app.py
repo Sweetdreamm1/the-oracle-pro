@@ -5,7 +5,7 @@ import os
 app = Flask(__name__)
 
 # --- ประทับตราสัจธรรม (ใส่ API Key อันใหม่ของบอสตรงนี้เลย) ---
-GEMINI_API_KEY = "ใAIzaSyBt2XEu6n8pKgcrV3x3uLqgM899ZeUB72w"
+GEMINI_API_KEY = "AIzaSyBt2XEu6n8pKgcrV3x3uLqgM899ZeUB72w"
 PAGE_ACCESS_TOKEN = "EAALZAVSrprsEBQs7syZC1g03CaRP1J3u0bShVTSiQneRPFCaU8uxiUZAsivvNP9eeZAWOIRbRwyU3nhJLsVFvWolDH4GM1bZBZCAVCxXTkIvylyNCeFC8yYdPr4RZBIEH6ZCa0ioLTbs82HsnhlqM2ybCTOQDvVLszXGAGVbffTyzXHL4gKB1XlZB8AurotdJnvxlxPbUZAg4DMoYzB0oDbzdZC0OZC5dAZDZD"
 VERIFY_TOKEN = "theoracle_bossbook"
 
