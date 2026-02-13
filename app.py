@@ -5,7 +5,7 @@ import os
 app = Flask(__name__)
 
 # --- ประทับกุญแจที่บอส "สร้าง" (Generate) มาล่าสุดที่นี่ ---
-PAGE_ACCESS_TOKEN = "EAALZAVSrprsEBQvZAo9SUNft1h3k1wILBls0YuRcf2K4rmmB2DFvsZAELmN42viz1ZBvNcOrZBuLGKlr4MmCUsnnjbtYUslGpSNTsZCk2cjwsYemvF5H1ZAh14zBiHRjWpA0ZBGX5EtCtTlZArbuoVrH2jCD0Pk2VQoB5TEqwXiHw3GHavUqX0yBHxZCWpx0yiXPBmIN9edsIeizVsNElOy9UDnyJ25wZDZD"
+PAGE_ACCESS_TOKEN = "EAALZAVSrprsEBQnQHzXX1RIpJ8NGZAFZAEqM2ZAKzbhtZA9B2hovDrK55ShxUU2zO3kbam5rX71mnIcZAVJqAcm1WxsBrfhyIQFLgk5OsUEnaevYylTZBRNOwLxNBIYiyZBAK7deZAs1SagdF7zizOruyraJ0TgjI9h7N0gW5cnoDa1ETKSpYLp21UOvABZABr5WolTIXSF8Hz9BWfE4wpYWh8QzsZBVQZDZD"
 VERIFY_TOKEN = "theoracle_bossbook"
 
 @app.route("/", methods=["GET"])
