@@ -6,7 +6,7 @@ import google.generativeai as genai
 app = Flask(__name__)
 
 # --- ประทับตราสัจธรรม ---
-GEMINI_API_KEY = "AIzaSyAltPoRUQ8X73oNbHPt8tFWnea5iYweHms"
+GEMINI_API_KEY = "AIzaSyCw1eaL5SzApaVcE0oTvsDsnu0M77YKyo4"
 PAGE_ACCESS_TOKEN = "EAALZAVSrprsEBQs7syZC1g03CaRP1J3u0bShVTSiQneRPFCaU8uxiUZAsivvNP9eeZAWOIRbRwyU3nhJLsVFvWolDH4GM1bZBZCAVCxXTkIvylyNCeFC8yYdPr4RZBIEH6ZCa0ioLTbs82HsnhlqM2ybCTOQDvVLszXGAGVbffTyzXHL4gKB1XlZB8AurotdJnvxlxPbUZAg4DMoYzB0oDbzdZC0OZC5dAZDZD"
 VERIFY_TOKEN = "theoracle_bossbook"
 
@@ -44,7 +44,7 @@ def webhook():
 def ask_gemini(question):
     try:
         # ย้ายมาเรียกใช้ข้างในนี้เพื่อเลี่ยง Error 404 ตอนเริ่มระบบ
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-1.5-flash-8b')
         response = model.generate_content(f"{PROMPT_SETTING}\n\nคำถามจากดวงจิต: {question}")
         return response.text
     except Exception as e:
