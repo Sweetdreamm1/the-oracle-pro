@@ -4,8 +4,8 @@ import os
 
 app = Flask(__name__)
 
-# --- ประทับตราสัจธรรม (ข้อมูลของบอสบุ๊ค) ---
-GEMINI_API_KEY = "AIzaSyBt2XEu6n8pKgcrV3x3uLqgM899ZeUB72w"
+# --- ประทับตราสัจธรรม (ใส่ API Key อันใหม่ของบอสตรงนี้เลย) ---
+GEMINI_API_KEY = "ใAIzaSyBt2XEu6n8pKgcrV3x3uLqgM899ZeUB72w"
 PAGE_ACCESS_TOKEN = "EAALZAVSrprsEBQs7syZC1g03CaRP1J3u0bShVTSiQneRPFCaU8uxiUZAsivvNP9eeZAWOIRbRwyU3nhJLsVFvWolDH4GM1bZBZCAVCxXTkIvylyNCeFC8yYdPr4RZBIEH6ZCa0ioLTbs82HsnhlqM2ybCTOQDvVLszXGAGVbffTyzXHL4gKB1XlZB8AurotdJnvxlxPbUZAg4DMoYzB0oDbzdZC0OZC5dAZDZD"
 VERIFY_TOKEN = "theoracle_bossbook"
 
@@ -38,8 +38,8 @@ def webhook():
 
 def ask_gemini(question):
     try:
-        # ทางลัด: ยิงเข้า API โดยตรง ตัดปัญหา Model Not Found
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={GEMINI_API_KEY}"
+        # สัจธรรมที่แท้จริง: ใช้รุ่น gemini-2.0-flash ที่ยังมีชีวิตอยู่ในเซิร์ฟเวอร์!
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
         payload = {
             "contents": [{
                 "parts": [{"text": f"{PROMPT_SETTING}\n\nคำถามจากดวงจิต: {question}"}]
@@ -54,7 +54,7 @@ def ask_gemini(question):
             return res_data["candidates"][0]["content"]["parts"][0]["text"]
         else:
             print(f"Gemini Error Log: {res_data}")
-            return "ขออภัย... สัญญาณจักรวาลขัดข้องชั่วครู่ โปรดลองใหม่อีกครั้ง"
+            return "ขออภัย... พลังเวทย์ขัดข้องชั่วครู่"
     except Exception as e:
         print(f"System Error: {e}")
         return "ขออภัย... ข้ากำลังรวบรวมสมาธิ โปรดถามใหม่อีกครั้ง"
