@@ -46,7 +46,7 @@ def webhook():
 def ask_gemini(question):
     try:
         # เปลี่ยนเป็น 'gemini-1.5-flash-latest' เพื่อบังคับใช้รุ่นปัจจุบันที่สุด
-        model = genai.GenerativeModel('gemini-1.5-flash-latest')
+        model = genai.GenerativeModel('gemini-1.5-flash')
         response = model.generate_content(f"{PROMPT_SETTING}\n\nคำถามจากดวงจิต: {question}")
         return response.text
     except Exception as e:
