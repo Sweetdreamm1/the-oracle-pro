@@ -5,7 +5,7 @@ import os
 app = Flask(__name__)
 
 # --- ประทับตราสัจธรรม (ข้อมูลของบอสบุ๊ค) ---
-GEMINI_API_KEY = "AIzaSyCw1eaL5SzApaVcE0oTvsDsnu0M77YKyo4"
+GEMINI_API_KEY = "AIzaSyBt2XEu6n8pKgcrV3x3uLqgM899ZeUB72w"
 PAGE_ACCESS_TOKEN = "EAALZAVSrprsEBQs7syZC1g03CaRP1J3u0bShVTSiQneRPFCaU8uxiUZAsivvNP9eeZAWOIRbRwyU3nhJLsVFvWolDH4GM1bZBZCAVCxXTkIvylyNCeFC8yYdPr4RZBIEH6ZCa0ioLTbs82HsnhlqM2ybCTOQDvVLszXGAGVbffTyzXHL4gKB1XlZB8AurotdJnvxlxPbUZAg4DMoYzB0oDbzdZC0OZC5dAZDZD"
 VERIFY_TOKEN = "theoracle_bossbook"
 
@@ -39,7 +39,7 @@ def webhook():
 def ask_gemini(question):
     try:
         # ทางลัด: ยิงเข้า API โดยตรง ตัดปัญหา Model Not Found
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={GEMINI_API_KEY}"
         payload = {
             "contents": [{
                 "parts": [{"text": f"{PROMPT_SETTING}\n\nคำถามจากดวงจิต: {question}"}]
