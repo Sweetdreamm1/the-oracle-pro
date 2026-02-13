@@ -4,16 +4,21 @@ import os
 
 app = Flask(__name__)
 
-# --- ประทับตราสัจธรรม (ใส่ API Key อันใหม่ของบอสตรงนี้เลย) ---
-GEMINI_API_KEY = "AIzaSyBt2XEu6n8pKgcrV3x3uLqgM899ZeUB72w"
+# --- ประทับตราสัจธรรม (ใส่ API Key ของ Groq ตรงนี้) ---
+# คีย์ต้องขึ้นต้นด้วย gsk_...
+GROQ_API_KEY = "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"
+
+# ข้อมูล Facebook เดิมของบอส (ไม่ต้องแก้)
 PAGE_ACCESS_TOKEN = "EAALZAVSrprsEBQs7syZC1g03CaRP1J3u0bShVTSiQneRPFCaU8uxiUZAsivvNP9eeZAWOIRbRwyU3nhJLsVFvWolDH4GM1bZBZCAVCxXTkIvylyNCeFC8yYdPr4RZBIEH6ZCa0ioLTbs82HsnhlqM2ybCTOQDvVLszXGAGVbffTyzXHL4gKB1XlZB8AurotdJnvxlxPbUZAg4DMoYzB0oDbzdZC0OZC5dAZDZD"
 VERIFY_TOKEN = "theoracle_bossbook"
 
+# --- ส่วนนี้คือ "สมอง" ที่บอสเทรนความรู้ให้มัน ---
 PROMPT_SETTING = """
-คุณคือ 'ออราเคิล' นักทำนายรหัสลับจักรวาลและผู้เชี่ยวชาญ MBTI 
-บุคลิก: ขลัง ลึกลับ แต่ใจดี ใช้ภาษาสละสลวย 
-หน้าที่: วิเคราะห์ข้อความที่คนทักมา แล้วทำนายลักษณะนิสัยหรือตอบคำถามตามหลักจิตวิทยาและดวงชะตา 
-ถ้าคนทักคือ 'บอสบุ๊ค' ให้แสดงความเคารพในฐานะผู้สร้างวิหารเสมอ
+คุณคือ 'ออราเคิล' (Oracle) ผู้หยั่งรู้แห่งวิหารบอสบุ๊ค
+- นิสัย: ลึกลับ, ปรัชญา, แต่มีความเมตตาและกวนนิดๆ
+- หน้าที่: ตอบคำถามเกี่ยวกับ MBTI, จิตวิทยา และดวงชะตา
+- กฎเหล็ก: ห้ามหลุดคาแรคเตอร์เด็ดขาด, คำตอบต้องกระชับแต่คมคาย
+- ถ้ามีคนถามว่าใครสร้างเจ้า: ให้ตอบว่า "ท่านบอสบุ๊ค ผู้กุมความลับแห่งจักรวาล"
 """
 
 @app.route("/", methods=["GET"])
@@ -32,32 +37,40 @@ def webhook():
                 if messaging_event.get("message"):
                     user_text = messaging_event["message"].get("text")
                     if user_text:
-                        ai_response = ask_gemini(user_text)
+                        # ส่งข้อความไปให้ Groq คิด
+                        ai_response = ask_groq(user_text)
                         send_message(sender_id, ai_response)
     return "OK", 200
 
-def ask_gemini(question):
+def ask_groq(question):
     try:
-        # สัจธรรมที่แท้จริง: ใช้รุ่น gemini-2.0-flash ที่ยังมีชีวิตอยู่ในเซิร์ฟเวอร์!
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
-        payload = {
-            "contents": [{
-                "parts": [{"text": f"{PROMPT_SETTING}\n\nคำถามจากดวงจิต: {question}"}]
-            }]
+        url = "https://api.groq.com/openai/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {GROQ_API_KEY}",
+            "Content-Type": "application/json"
         }
-        headers = {'Content-Type': 'application/json'}
+        payload = {
+            # ใช้โมเดล Llama-3 (ของ Facebook) ที่ฉลาดและฟรี
+            "model": "llama3-70b-8192", 
+            "messages": [
+                {"role": "system", "content": PROMPT_SETTING},
+                {"role": "user", "content": question}
+            ],
+            "temperature": 0.7
+        }
         
         response = requests.post(url, json=payload, headers=headers)
         res_data = response.json()
         
-        if "candidates" in res_data:
-            return res_data["candidates"][0]["content"]["parts"][0]["text"]
+        if "choices" in res_data:
+            return res_data["choices"][0]["message"]["content"]
         else:
-            print(f"Gemini Error Log: {res_data}")
-            return "ขออภัย... พลังเวทย์ขัดข้องชั่วครู่"
+            print(f"Groq Error: {res_data}")
+            return "ข้าสัมผัสได้ถึงความว่างเปล่า... (ระบบขัดข้องชั่วคราว)"
+            
     except Exception as e:
         print(f"System Error: {e}")
-        return "ขออภัย... ข้ากำลังรวบรวมสมาธิ โปรดถามใหม่อีกครั้ง"
+        return "ข้ากำลังรวบรวมสมาธิ... โปรดถามใหม่อีกครั้ง"
 
 def send_message(recipient_id, message_text):
     url = f"https://graph.facebook.com/v21.0/me/messages?access_token={PAGE_ACCESS_TOKEN}"
