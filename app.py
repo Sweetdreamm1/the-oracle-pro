@@ -5,15 +5,14 @@ import google.generativeai as genai
 
 app = Flask(__name__)
 
-# --- ประทับตราสัจธรรม (ใส่ข้อมูลของบอสตรงนี้) ---
+# --- ประทับตราสัจธรรม ---
 GEMINI_API_KEY = "AIzaSyAltPoRUQ8X73oNbHPt8tFWnea5iYweHms"
 PAGE_ACCESS_TOKEN = "EAALZAVSrprsEBQs7syZC1g03CaRP1J3u0bShVTSiQneRPFCaU8uxiUZAsivvNP9eeZAWOIRbRwyU3nhJLsVFvWolDH4GM1bZBZCAVCxXTkIvylyNCeFC8yYdPr4RZBIEH6ZCa0ioLTbs82HsnhlqM2ybCTOQDvVLszXGAGVbffTyzXHL4gKB1XlZB8AurotdJnvxlxPbUZAg4DMoYzB0oDbzdZC0OZC5dAZDZD"
 VERIFY_TOKEN = "theoracle_bossbook"
 
-# ตั้งค่าสมอง Gemini
+# ตั้งค่าพื้นฐาน (Configuration)
 genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
-# คำสั่งศักดิ์สิทธิ์ (System Prompt) - บอสแก้บุคลิกตรงนี้ได้เลย
+
 PROMPT_SETTING = """
 คุณคือ 'ออราเคิล' นักทำนายรหัสลับจักรวาลและผู้เชี่ยวชาญ MBTI 
 บุคลิก: ขลัง ลึกลับ แต่ใจดี ใช้ภาษาสละสลวย 
@@ -37,24 +36,37 @@ def webhook():
                 if messaging_event.get("message"):
                     user_text = messaging_event["message"].get("text")
                     if user_text:
-                        # อัญเชิญ Gemini มาคิดหาคำตอบ
+                        # อัญเชิญพลัง Gemini
                         ai_response = ask_gemini(user_text)
                         send_message(sender_id, ai_response)
     return "OK", 200
 
 def ask_gemini(question):
     try:
+        # ย้ายมาเรียกใช้ข้างในนี้เพื่อเลี่ยง Error 404 ตอนเริ่มระบบ
+        model = genai.GenerativeModel('gemini-1.5-flash')
         response = model.generate_content(f"{PROMPT_SETTING}\n\nคำถามจากดวงจิต: {question}")
         return response.text
     except Exception as e:
-        print(f"Error Gemini: {e}")
-        return "ขออภัย... สัญญาณจักรวาลขัดข้องชั่วครู่ โปรดลองใหม่อีกครั้ง"
+        print(f"Error Gemini Details: {e}")
+        # แผนสำรอง: ถ้า flash มีปัญหา ให้ลองใช้รุ่นดั้งเดิม
+        try:
+            model_alt = genai.GenerativeModel('gemini-pro')
+            response = model_alt.generate_content(f"{PROMPT_SETTING}\n\nคำถามจากดวงจิต: {question}")
+            return response.text
+        except:
+            return "ขออภัย... สัญญาณจักรวาลขัดข้องชั่วครู่ โปรดลองใหม่อีกครั้ง"
 
 def send_message(recipient_id, message_text):
     url = f"https://graph.facebook.com/v21.0/me/messages?access_token={PAGE_ACCESS_TOKEN}"
     payload = {"recipient": {"id": recipient_id}, "message": {"text": message_text}}
-    requests.post(url, json=payload)
+    try:
+        r = requests.post(url, json=payload)
+        print(f"Facebook Response: {r.status_code} - {r.text}")
+    except Exception as e:
+        print(f"Error Sending to Facebook: {e}")
 
 if __name__ == "__main__":
+    # มั่นใจว่า Port จะถูกดึงจาก Render อย่างถูกต้อง
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
