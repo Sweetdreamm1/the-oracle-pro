@@ -44,7 +44,7 @@ def webhook():
 def ask_gemini(question):
     try:
         # ย้ายมาเรียกใช้ข้างในนี้เพื่อเลี่ยง Error 404 ตอนเริ่มระบบ
-        model = genai.GenerativeModel('gemini-1.5-flash-8b')
+       model = genai.GenerativeModel('gemini-1.5-pro')
         response = model.generate_content(f"{PROMPT_SETTING}\n\nคำถามจากดวงจิต: {question}")
         return response.text
     except Exception as e:
