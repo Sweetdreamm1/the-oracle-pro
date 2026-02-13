@@ -45,14 +45,13 @@ def webhook():
 
 def ask_gemini(question):
     try:
-        # ใช้รุ่น gemini-1.5-flash ซึ่งเสถียรที่สุดในตอนนี้
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        # เปลี่ยนเป็น 'gemini-1.5-flash-latest' เพื่อบังคับใช้รุ่นปัจจุบันที่สุด
+        model = genai.GenerativeModel('gemini-1.5-flash-latest')
         response = model.generate_content(f"{PROMPT_SETTING}\n\nคำถามจากดวงจิต: {question}")
         return response.text
     except Exception as e:
         print(f"Error Gemini Details: {e}")
-        # แผนสำรองถ้าเครื่องมือหลักขัดข้อง
-        return "ขออภัย... สัญญาณจักรวาลขัดข้องชั่วครู่ โปรดลองถามใหม่อีกครั้ง"
+        return "ขออภัย... สัญญาณจักรวาลขัดข้องชั่วครู่ โปรดลองใหม่อีกครั้ง"
 
 def send_message(recipient_id, message_text):
     url = f"https://graph.facebook.com/v21.0/me/messages?access_token={PAGE_ACCESS_TOKEN}"
