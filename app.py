@@ -12,8 +12,7 @@ VERIFY_TOKEN = "theoracle_bossbook"
 
 # ตั้งค่าสมอง Gemini
 genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash-latest')
-
+model = genai.GenerativeModel('gemini-1.5-flash')
 # คำสั่งศักดิ์สิทธิ์ (System Prompt) - บอสแก้บุคลิกตรงนี้ได้เลย
 PROMPT_SETTING = """
 คุณคือ 'ออราเคิล' นักทำนายรหัสลับจักรวาลและผู้เชี่ยวชาญ MBTI 
