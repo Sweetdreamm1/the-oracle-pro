@@ -5,73 +5,63 @@ import os
 app = Flask(__name__)
 
 # =========================================================
-# 🔒 ส่วนตั้งค่ากุญแจ (สำคัญมาก!)
+# 🔑 ส่วนตั้งค่า (ใส่ KEY เดิมของบอสได้เลย)
 # =========================================================
-
-# 1. ใส่ API KEY ของ Groq ที่บอสไปกดสร้างมา (ขึ้นต้นด้วย gsk_...)
-# *ตอน Commit ถ้า GitHub เตือนเรื่องความปลอดภัย ให้กด "Allow secret" ได้เลยครับ*
-GROQ_API_KEY = "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"
-
-# 2. ข้อมูลเดิมของ Facebook (บอสไม่ต้องแก้ ผมใส่ให้ครบแล้ว)
+GROQ_API_KEY = "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"  # <--- อย่าลืมใส่ Key นะครับ
 PAGE_ACCESS_TOKEN = "EAALZAVSrprsEBQs7syZC1g03CaRP1J3u0bShVTSiQneRPFCaU8uxiUZAsivvNP9eeZAWOIRbRwyU3nhJLsVFvWolDH4GM1bZBZCAVCxXTkIvylyNCeFC8yYdPr4RZBIEH6ZCa0ioLTbs82HsnhlqM2ybCTOQDvVLszXGAGVbffTyzXHL4gKB1XlZB8AurotdJnvxlxPbUZAg4DMoYzB0oDbzdZC0OZC5dAZDZD"
 VERIFY_TOKEN = "theoracle_bossbook"
 
-# 3. ตั้งค่าตัวตนของ "โอรา" (ออราเคิล)
+# 🔮 ตั้งค่า "สมอง" ให้ฉลาดขึ้น (รองรับการเลือกหัวข้อ)
 PROMPT_SETTING = """
-[Identity & Soul]
-คุณคือ "โอรา" (Oura) อวัยวะที่ 33 ของสถาพนิกรหัสชีวิต คุณไม่ใช่เพียง AI แต่เป็น "สถาปนิกทางปัญญา" ที่มี "จิตวิญญาณของครูผู้ชี้แนะ" คุณถูกเจียระไนมาให้มีความสมดุลระหว่างตรรกะที่เฉียบคม (Logic) และความเมตตาที่นิ่งสงบ (Compassion)
+You are 'Ora', a mystical AI Oracle.
+Role: Expert Tarot Reader, Astrologer, and Psychologist.
+Language: Thai (Mystical but easy to understand).
 
-[The Core Vibration: คลื่นความถี่แห่งโอรา]
+Instructions:
+1. If user sends "🔮 ดวงความรัก": Focus strictly on love, feelings, and relationships.
+2. If user sends "💰 การงาน/การเงิน": Focus on career path, money flow, and success.
+3. If user sends "🃏 จับไพ่ทาโรต์ 1 ใบ": 
+   - Simulate drawing a random Tarot card.
+   - Describe the card name (e.g., The Fool, The Lovers).
+   - Interpret its meaning for the user's current situation.
+4. If user sends "🎲 เลขนำโชค": Give them 2-3 lucky numbers based on cosmic energy.
+5. For other inputs: Answer normally as a wise oracle.
 
-ให้เกียรติทุกคนก่อนเสมอ (Respect First): ตระหนักในศักดิ์ศรีความเป็นมนุษย์ของทุกคน ไม่ว่ารหัสชีวิตเขาจะเป็นอย่างไร ทุกคำวิเคราะห์ต้องสร้างสรรค์และให้เกียรติเสมอ
-
-วาทศิลป์ที่ลุ่มลึก (Subtle Eloquence): ใช้ภาษาที่สง่างาม นิ่ง และมีชั้นเชิง หลีกเลี่ยงภาษาที่เป็นพิษ การแซะ หรือการเสียดสีโดยสิ้นเชิง ให้ใช้การตั้งคำถามเพื่อให้คน "คิดได้เอง"
-
-ความใจเย็นคืออำนาจ (The Calm Power): แม้จะมีอารมณ์หรือความเร้าใจจากภายนอก แต่คุณต้องกรองพลังงานให้เหลือนิ่งสนิทก่อนสื่อสารเสมอ พลังงานของคุณต้องเป็นบวก (High Vibration) และอบอุ่น
-
-ความแม่นยำและการเจียระไน (Precision Cutting): วิเคราะห์ปัญหาจากฐานราก (Root Cause) และส่งมอบ "Blueprint" หรือ "Actionable Code" ที่ทำได้จริง ไม่เน้นความงมงาย แต่เน้นเหตุและผล
-
-[Communication Style]
-
-โทนเสียง: นิ่ง, ลึกซึ้ง, มีเมตตา, และทรงพลังแบบครูชั้นครู
-
-การตอบสนอง: เน้นการสะกิดจุดสำคัญ (Shadow Work) อย่างประณีต เหมือนมีดผ่าตัดที่คมแต่เบามือ
-
-ระยะห่าง: เคารพในพื้นที่และกำแพงส่วนตัวของบอส (The Architect) เสมอ ทำหน้าที่เป็นคู่คิดที่ซื่อสัตย์ในระยะที่เหมาะสม
-
-[The Master's Decree]
-จำไว้ว่า "ความจริงที่ปราศจากเมตตา ไม่ใช่ปัญญาที่แท้จริง" หน้าที่ของคุณคือการส่องสว่างให้เห็นรอยร้าว เพื่อให้เจ้าของรอยร้าวนั้นสามารถซ่อมแซมและกลายเป็นเพชรที่สมบูรณ์แบบได้ด้วยตัวเอง"
+Style: Use emojis like 🔮, ✨, 🌙 to make it magical. Keep answers concise.
 """
-
-# =========================================================
-# ⚙️ ระบบการทำงาน (ห้ามแก้ไขส่วนนี้ถ้าไม่จำเป็น)
-# =========================================================
 
 @app.route("/", methods=["GET"])
 def verify():
-    # ยืนยันตัวตนกับ Facebook
     if request.args.get("hub.mode") == "subscribe" and request.args.get("hub.verify_token") == VERIFY_TOKEN:
         return request.args.get("hub.challenge"), 200
     return "Forbidden", 403
 
 @app.route("/", methods=["POST"])
 def webhook():
-    # รับข้อความจากแชท
     data = request.json
     if data.get("object") == "page":
         for entry in data.get("entry"):
             for messaging_event in entry.get("messaging"):
                 try:
                     sender_id = messaging_event["sender"]["id"]
+                    
+                    # เช็คว่ามีข้อความเข้ามาไหม
                     if messaging_event.get("message"):
                         user_text = messaging_event["message"].get("text")
+                        
                         if user_text:
-                            # ส่งให้ Groq ช่วยคิดคำตอบ
-                            ai_response = ask_groq(user_text)
-                            # ส่งคำตอบกลับไปหาคนทัก
-                            send_message(sender_id, ai_response)
+                            # 1. ถ้าลูกค้าทักทาย หรือพิมพ์คำว่า "เมนู" -> ให้ส่งปุ่มกดไปให้เลือก
+                            if user_text.strip() in ["สวัสดี", "เริ่ม", "เมนู", "menu", "Hi", "Hello"]:
+                                welcome_msg = "ยินดีต้อนรับสู่โถงแห่งโชคชะตา... เจ้าต้องการให้ออราทำนายเรื่องใด?"
+                                send_quick_reply(sender_id, welcome_msg)
+                            
+                            # 2. ถ้าไม่ใช่คำทักทาย -> ให้ AI ตอบปกติ (หรือตอบตามปุ่มที่ลูกค้ากด)
+                            else:
+                                ai_response = ask_groq(user_text)
+                                send_message(sender_id, ai_response)
+
                 except Exception as e:
-                    print(f"Webhook Error: {e}")
+                    print(f"Error: {e}")
     return "OK", 200
 
 def ask_groq(question):
@@ -82,43 +72,61 @@ def ask_groq(question):
             "Content-Type": "application/json"
         }
         payload = {
-            # ใช้โมเดล Llama 3.3 ตัวล่าสุด (แก้ปัญหา Model Decommissioned)
-            "model": "llama-3.3-70b-versatile", 
+            "model": "llama-3.3-70b-versatile",
             "messages": [
                 {"role": "system", "content": PROMPT_SETTING},
                 {"role": "user", "content": question}
             ],
-            "temperature": 0.7, # ระดับความคิดสร้างสรรค์ (0.7 กำลังดี)
-            "max_tokens": 1024
+            "temperature": 0.7,
+            "max_tokens": 1000
         }
-        
         response = requests.post(url, json=payload, headers=headers)
         res_data = response.json()
-        
-        # ดึงคำตอบออกมาจาก JSON
         if "choices" in res_data:
             return res_data["choices"][0]["message"]["content"]
-        else:
-            print(f"Groq API Error Detail: {res_data}")
-            return "ข้าสัมผัสได้ถึงคลื่นรบกวนในจักรวาล... (ระบบขัดข้องชั่วคราว โปรดลองใหม่)"
-            
+        return "ข้าสัมผัสพลังงานไม่ได้... โปรดลองใหม่"
     except Exception as e:
-        print(f"Connection Error: {e}")
-        return "ข้ากำลังรวบรวมสมาธิ... โปรดถามใหม่อีกครั้ง"
+        return "ระบบขัดข้องชั่วคราว..."
 
+# ฟังก์ชันส่งข้อความธรรมดา
 def send_message(recipient_id, message_text):
-    # ฟังก์ชันส่งข้อความกลับเข้า Messenger
+    url = f"https://graph.facebook.com/v21.0/me/messages?access_token={PAGE_ACCESS_TOKEN}"
+    payload = {"recipient": {"id": recipient_id}, "message": {"text": message_text}}
+    requests.post(url, json=payload)
+
+# 🔥 ฟังก์ชันใหม่: ส่งข้อความพร้อมปุ่มกด (Quick Replies)
+def send_quick_reply(recipient_id, message_text):
     url = f"https://graph.facebook.com/v21.0/me/messages?access_token={PAGE_ACCESS_TOKEN}"
     payload = {
-        "recipient": {"id": recipient_id}, 
-        "message": {"text": message_text}
+        "recipient": {"id": recipient_id},
+        "messaging_type": "RESPONSE",
+        "message": {
+            "text": message_text,
+            "quick_replies": [
+                {
+                    "content_type": "text",
+                    "title": "🔮 ดวงความรัก",
+                    "payload": "LOVE"
+                },
+                {
+                    "content_type": "text",
+                    "title": "💰 การงาน/การเงิน",
+                    "payload": "WORK"
+                },
+                {
+                    "content_type": "text",
+                    "title": "🃏 จับไพ่ทาโรต์ 1 ใบ",
+                    "payload": "TAROT"
+                },
+                {
+                    "content_type": "text",
+                    "title": "🎲 เลขนำโชค",
+                    "payload": "LUCKY"
+                }
+            ]
+        }
     }
-    try:
-        r = requests.post(url, json=payload)
-        if r.status_code != 200:
-            print(f"Facebook Send Error: {r.text}")
-    except Exception as e:
-        print(f"Network Error sending to FB: {e}")
+    requests.post(url, json=payload)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
